@@ -1,0 +1,70 @@
+# Example configuration for ocrdoc.
+# Copy to config.yml and adjust. Precedence: CLI arguments > config.yml > defaults.
+# Keep API keys private and exclude config.yml from version control.
+
+# Working directories
+workspace: ./workspace
+input: ./workspace/input
+skills_dir: ./skills
+
+# OCR engine and document processing
+ocr:
+  engine: paddleocr         # paddleocr | openai | openai_compatible
+                             # NOTE: any engine other than paddleocr transcribes
+                             # images with the ai.model below, so that model
+                             # MUST support vision (image input).
+  language: id              # Document language
+  output_format: md         # md | txt
+  device: auto              # auto | gpu | cpu (PaddleOCR only)
+  enable_mkldnn: false      # Disabled to avoid PP-OCRv6 compatibility issues
+
+# ONE hosted model for both routes — every AI request comes from
+# this section: reconstruction after the self-hosted PaddleOCR engine,
+# and the full combined request (transcribe image + apply skills) for
+# the hosted vision engines. The model must support vision whenever
+# ocr.engine is openai / openai_compatible.
+ai:
+  provider: openai          # openai | openai_compatible | passthrough
+  model: null               # null = provider default (gpt-4o-mini for openai).
+                             # Must support vision whenever it is used for
+                             # OCR (ocr.engine openai / openai_compatible):
+                             # one request transcribes the image and applies
+                             # the skills.
+  base_url: null            # Endpoint URL without /chat/completions
+                             # (required for openai_compatible)
+  api_key: null             # One key for every AI request. Never logged.
+  timeout: 120              # Request timeout in seconds
+  max_retries: 2
+
+  skill: default            # default | [skill1, skill2] | ...
+  temperature: 0.1          # Sampling temperature for every AI request
+  context_chars: 800        # Context from the end of the previous page
+  reasoning_effort: null    # minimal | low | medium | high | none
+  max_tokens: null          # Max completion tokens for one AI request
+  extra_headers: null       # Example: {X-Title: ocrdoc}
+
+# Optional image preprocessing before OCR
+preprocessing:
+  enabled: false
+  grayscale: true
+  autocontrast: true
+  upscale: 1                # Values >1 enlarge the image
+  binarize: false           # Apply Otsu thresholding
+
+# Output formats and optional watermark
+export:
+  formats:                  # docx | pdf
+    - docx
+  watermark:
+    enabled: false
+    text: DRAFT
+    position: center        # center | horizontal | vertical | diagonal | tile
+                            # | top-left | top | top-right
+                            # | left | right
+                            # | bottom-left | bottom | bottom-right
+    font_size: 48
+    opacity: 0.15
+    rotation: 45            # degrees, used by the diagonal position
+
+# Enable detailed processing logs
+verbose: false

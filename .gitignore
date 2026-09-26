@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Config file holding secrets (copy config.example.yml instead)
+config.yml
+config.yaml
+
+# Runtime workspace (inputs may be kept deliberately; outputs are generated)
+workspace/output/
+workspace/preprocessed/
+workspace/ocr/
+workspace/reconstructed/
+workspace/manifest.json
